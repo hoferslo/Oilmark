@@ -98,6 +98,9 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
             Note("Switch off what you don't use. Nothing is deleted - it is only hidden in this app.")
 
+            Heading("Notifications")
+            ReminderNotificationSetting()
+
             Heading("Start screen")
             // Looked up by id, so it shows the vehicle's current name and photo.
             val starredId = settings.defaultVehicleId
@@ -240,6 +243,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
             Note("Only the symbol changes - amounts stay exactly as they are, nothing is converted.")
+
+            Heading("Android Auto (test)")
+            AndroidAutoSetting()
+            Note(
+                "Adds a screen to Android Auto that shows what your car shares with the phone: model, " +
+                    "odometer, speed and fuel level. It stays on until you switch it off. Android Auto only " +
+                    "shows it if \"Unknown sources\" is on in Android Auto's developer settings.",
+            )
 
             Heading("Server")
             Card(Modifier.fillMaxWidth()) {

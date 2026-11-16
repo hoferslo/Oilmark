@@ -86,6 +86,26 @@ data class DistanceStats(
     val perYear: Double? get() = perDay?.times(365.25)
 }
 
+/** Everything that happened between two dates, for cost-per-distance and comparisons. */
+data class Totals(
+    /** Distance driven in the range (estimated where it starts or ends between two readings). */
+    val distance: Int = 0,
+    /** All money spent: fuel, service, repairs, upgrades, taxes. */
+    val spent: Double = 0.0,
+    val fuelSpent: Double = 0.0,
+    /** Fuel bought in the range. */
+    val fuelBought: Double = 0.0,
+    /** Full-tank to full-tank stretches that ended in the range: what consumption is computed from. */
+    val measuredDistance: Int = 0,
+    val measuredFuel: Double = 0.0,
+) {
+    /** All costs per 100 km (or 100 mi). Null without any distance. */
+    val costPer100: Double? get() = if (distance > 0) spent / distance * 100 else null
+    val fuelCostPer100: Double? get() = if (distance > 0) fuelSpent / distance * 100 else null
+    val averageFuelPrice: Double? get() = if (fuelBought > 0) fuelSpent / fuelBought else null
+    val isEmpty: Boolean get() = distance == 0 && spent == 0.0
+}
+
 private const val DAYS_PER_MONTH = 30.44
 
 /** Turns lists of records into chart data and summary numbers. Pure functions, no server calls. */
@@ -193,6 +213,28 @@ object Stats {
         val share = ChronoUnit.DAYS.between(fromDate, date).toDouble() / ChronoUnit.DAYS.between(fromDate, toDate)
         return from + (to - from) * share
     }
+
+    // ---- totals ----
+
+    /** Everything in [records] that happened from [start] (inclusive) to [end] (exclusive). */
+    fun totals(records: Map<RecordType, List<Record>>, start: LocalDate, end: LocalDate): Totals {
+        fun inRange(record: Record) = Formats.parseDate(record.date)?.let { it >= start && it < end } == true
+        val fuel = records[RecordType.Fuel].orEmpty()
+        val bought = fuel.filter(::inRange)
+        val measured = tanks(fills(fuel)).filter { it.date >= start && it.date < end }
+        return Totals(
+            distance = driven(readings(odometerTypes.flatMap { records[it].orEmpty() }), start, end),
+            spent = spendingTypes.sumOf { type -> records[type].orEmpty().filter(::inRange).sumOf { it.cost ?: 0.0 } },
+            fuelSpent = bought.sumOf { it.cost ?: 0.0 },
+            fuelBought = bought.sumOf { it.fuelConsumed ?: 0.0 },
+            measuredDistance = measured.sumOf { it.distance },
+            measuredFuel = measured.sumOf { it.fuel },
+        )
+    }
+
+    /** The first year anything was recorded in, or null with no dated records. */
+    fun firstYear(records: Map<RecordType, List<Record>>): Int? =
+        records.values.flatten().mapNotNull { Formats.parseDate(it.date)?.year }.minOrNull()
 
     // ---- fuel ----
 

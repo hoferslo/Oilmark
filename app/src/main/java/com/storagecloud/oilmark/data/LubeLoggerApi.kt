@@ -144,6 +144,10 @@ class LubeLoggerApi(val server: Server) {
             "useUKMPG" to (units == Units.UK).takeIf { type == RecordType.Fuel },
         ).map { it.fromServer() }
 
+    /** Records of one [type] for every vehicle at once (each says which vehicle it belongs to). */
+    suspend fun allRecords(type: RecordType): List<Record> =
+        get<List<Record>>("api/vehicle/${type.path}/all").map { it.fromServer() }
+
     suspend fun record(type: RecordType, vehicleId: Int, id: Int): Record =
         get<List<Record>>("api/vehicle/${type.path}", "vehicleId" to vehicleId, "id" to id).firstOrNull()
             ?.fromServer()

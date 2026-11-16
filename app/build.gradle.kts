@@ -61,6 +61,12 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    // Reminder notifications (notify/) and the home-screen widget (widget/)
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.glance.appwidget)
+    // Android Auto (the optional test screen in car/)
+    implementation(libs.androidx.car.app)
+    implementation(libs.androidx.car.app.projected)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

@@ -16,7 +16,9 @@ import androidx.compose.material.icons.outlined.PriorityHigh
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.material.icons.outlined.Sell
+import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Store
+import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material.icons.outlined.Timelapse
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.AutoAwesome
@@ -31,10 +33,12 @@ import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.automirrored.outlined.StickyNote2
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.storagecloud.oilmark.data.Extra
 import com.storagecloud.oilmark.data.Field
 import com.storagecloud.oilmark.data.Formats
 import com.storagecloud.oilmark.data.Record
 import com.storagecloud.oilmark.data.RecordType
+import com.storagecloud.oilmark.data.extra
 
 /* How each kind of record looks in the UI: its icon, its row in a list, and its sort order. */
 
@@ -73,6 +77,8 @@ val Field.icon: ImageVector
         label == "Quantity" -> Icons.Outlined.Numbers
         label == "Part number" -> Icons.Outlined.QrCode
         label == "Supplier" -> Icons.Outlined.Store
+        label == "Station" -> Icons.Outlined.Storefront
+        label == "Location" -> Icons.Outlined.Place
         label == "Currently equipped" -> Icons.Outlined.CheckCircle
         label == "Pinned" -> Icons.Outlined.PushPin
         else -> Icons.Outlined.Edit // Description, Title and anything new
@@ -103,6 +109,7 @@ fun RecordType.row(record: Record, formats: Formats, electric: Boolean): RecordR
             subtitle = join(
                 date,
                 odometer,
+                record.extra(Extra.STATION),
                 record.fuelEconomy?.takeIf { it > 0 }?.let { formats.economy(it, electric) },
             ),
             trailing = cost,

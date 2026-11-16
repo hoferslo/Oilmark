@@ -37,6 +37,8 @@ enum class FuelType { Gasoline, Diesel, Electric }
 data class VehicleInfo(
     val vehicleData: Vehicle = Vehicle(),
     val pastDueReminderCount: Int = 0,
+    /** The reminder that comes up first, if there is any. */
+    val nextReminder: Record? = null,
     val veryUrgentReminderCount: Int = 0,
     val urgentReminderCount: Int = 0,
     val notUrgentReminderCount: Int = 0,
@@ -85,6 +87,29 @@ data class VehicleInput(
 
 @Serializable
 data class ExtraField(val name: String = "", val value: String = "")
+
+/*
+ * Fields LubeLogger has no column for (station name, location) go into a record's
+ * "extra fields": LubeLogger keeps any name/value pair it is sent. If the same names are
+ * set up under Settings -> Extra Fields on the LubeLogger website, they show there too.
+ */
+
+/** The value of the extra field called [name], or null when it is missing or blank. */
+fun Record.extra(name: String): String? =
+    extraFields.firstOrNull { it.name.equals(name, ignoreCase = true) }?.value?.takeIf { it.isNotBlank() }
+
+/** A copy with the extra field [name] set to [value] (removed when [value] is blank). */
+fun Record.withExtra(name: String, value: String?): Record {
+    val others = extraFields.filterNot { it.name.equals(name, ignoreCase = true) }
+    return copy(extraFields = if (value.isNullOrBlank()) others else others + ExtraField(name, value.trim()))
+}
+
+/** Names of the extra fields the app itself uses. */
+object Extra {
+    const val STATION = "Station"
+    /** "latitude,longitude", e.g. "46.056946,14.505751". */
+    const val LOCATION = "Location"
+}
 
 @Serializable
 data class Attachment(val name: String = "", val location: String = "")

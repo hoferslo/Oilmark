@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    App icon in one colour, for Android's "themed icons" (the launcher tints it itself).
+    The oil level is cut out as a wavy gap, since there is no second colour to draw it with.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group>
+        <!-- Everything except a wavy band across the drop. -->
+        <clip-path android:pathData="M0,0H108V57.5C92,52 80,63 78,58.5C70,54 62,63 54,58.5C46,54 38,63 30,58.5L0,58.5ZM0,63.5L30,63.5C38,59 46,68 54,63.5C62,59 70,68 78,63.5L108,63.5V108H0Z" />
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M54,24C54,24 35,45.5 35,60A19,19 0 0 0 73,60C73,45.5 54,24 54,24Z" />
+    </group>
+</vector>

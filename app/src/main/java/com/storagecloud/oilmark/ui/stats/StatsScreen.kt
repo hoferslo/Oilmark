@@ -67,7 +67,8 @@ fun StatsScreen(vehicleId: Int, kind: StatsKind, onBack: () -> Unit) {
     val api = LocalApi.current
     val types = when (kind) {
         StatsKind.Distance -> Stats.odometerTypes
-        StatsKind.Spending -> Stats.spendingTypes
+        // Odometer readings too, for the cost per distance.
+        StatsKind.Spending -> Stats.spendingTypes + RecordType.Odometer
         StatsKind.Fuel -> listOf(RecordType.Fuel)
     }
     val loader = rememberLoader {
@@ -164,6 +165,23 @@ private fun SpendingContent(records: Map<RecordType, List<Record>>) {
     ChartCard(
         buckets, text = formats::money, series = Stats.spendingTypes.map { it.title },
         axis = { formats.number(it) }, unit = formats.currency,
+    )
+
+    // What running the car costs per distance over the same range, everything included.
+    val today = remember { LocalDate.now() }
+    val start = if (period == Period.Months) {
+        today.withDayOfMonth(1).minusMonths(11)
+    } else {
+        LocalDate.of(buckets.first().label.toInt(), 1, 1)
+    }
+    val totals = remember(records, period) { Stats.totals(records, start, today.plusDays(1)) }
+    val days = java.time.temporal.ChronoUnit.DAYS.between(start, today).coerceAtLeast(1)
+    val per = "per 100 ${formats.units.distance}"
+    Tiles(
+        "All costs $per" to (totals.costPer100?.let(formats::money) ?: "–"),
+        "Fuel only $per" to (totals.fuelCostPer100?.let(formats::money) ?: "–"),
+        "Distance driven" to formats.distance(totals.distance),
+        "Cost per day" to formats.money(total / days),
     )
 
     // Where the money went over the whole range.

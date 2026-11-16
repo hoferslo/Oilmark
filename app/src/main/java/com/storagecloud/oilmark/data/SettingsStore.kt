@@ -31,6 +31,12 @@ data class Settings(
     val fuelCountry: String? = null,
     /** The prices last fetched for [fuelCountry]; null when switched off or not fetched yet. */
     val countryPrices: CountryFuelPrices? = null,
+    /** Whether the quick fuel-up asks for the distance since the last fill-up instead of the odometer. */
+    val fuelByTrip: Boolean = false,
+    /** Whether the phone shows a notification when a reminder becomes due. */
+    val reminderNotifications: Boolean = true,
+    /** Whether the app has already asked Android for permission to show notifications. */
+    val notificationsAsked: Boolean = false,
     /** The vehicle the app opens straight into, if the user picked one. */
     val defaultVehicleId: Int? = null,
     /** Record types the user switched off; they are hidden on the vehicle screen. */
@@ -56,6 +62,9 @@ class SettingsStore(private val context: Context) {
                 ?.takeIf { prefs[ONLINE_PRICES] == true }
                 ?.let { saved -> runCatching { Json.decodeFromString<CountryFuelPrices>(saved) }.getOrNull() }
                 ?.takeIf { it.code == prefs[FUEL_COUNTRY] },
+            fuelByTrip = prefs[FUEL_BY_TRIP] == true,
+            reminderNotifications = prefs[NOTIFY_REMINDERS] != false,
+            notificationsAsked = prefs[NOTIFY_ASKED] == true,
             defaultVehicleId = prefs[DEFAULT_VEHICLE],
             hidden = RecordType.entries.filter { it.name in prefs[HIDDEN].orEmpty() }.toSet(),
         )
@@ -119,6 +128,18 @@ class SettingsStore(private val context: Context) {
         }
     }
 
+    suspend fun setFuelByTrip(byTrip: Boolean) {
+        context.dataStore.edit { it[FUEL_BY_TRIP] = byTrip }
+    }
+
+    suspend fun setReminderNotifications(enabled: Boolean) {
+        context.dataStore.edit { it[NOTIFY_REMINDERS] = enabled }
+    }
+
+    suspend fun setNotificationsAsked() {
+        context.dataStore.edit { it[NOTIFY_ASKED] = true }
+    }
+
     /** Pass null to go back to opening the garage. */
     suspend fun setDefaultVehicle(vehicleId: Int?) {
         context.dataStore.edit {
@@ -146,6 +167,9 @@ class SettingsStore(private val context: Context) {
         val ONLINE_PRICES = booleanPreferencesKey("online_fuel_prices")
         val FUEL_COUNTRY = stringPreferencesKey("fuel_country")
         val COUNTRY_PRICES = stringPreferencesKey("country_fuel_prices")
+        val FUEL_BY_TRIP = booleanPreferencesKey("fuel_by_trip")
+        val NOTIFY_REMINDERS = booleanPreferencesKey("notify_reminders")
+        val NOTIFY_ASKED = booleanPreferencesKey("notify_asked")
         val DEFAULT_VEHICLE = intPreferencesKey("default_vehicle")
         val HIDDEN = stringSetPreferencesKey("hidden_record_types")
     }

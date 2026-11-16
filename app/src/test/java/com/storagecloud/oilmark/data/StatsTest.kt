@@ -111,4 +111,26 @@ class StatsTest {
         assertEquals(36.0, november.fuel, 0.0)
         assertEquals(500, november.measuredDistance)
     }
+
+    @Test
+    fun totalsCoverEverythingInTheRange() {
+        val records = mapOf(
+            RecordType.Odometer to listOf(Record(date = "2026-01-01", odometer = 10_000)),
+            RecordType.Fuel to listOf(
+                Record(date = "2026-02-01", odometer = 11_000, fuelConsumed = 40.0, cost = 60.0, isFillToFull = true),
+                Record(date = "2026-03-01", odometer = 11_500, fuelConsumed = 35.0, cost = 56.0, isFillToFull = true),
+            ),
+            RecordType.Service to listOf(Record(date = "2026-03-10", odometer = 12_000, cost = 84.0)),
+            RecordType.Tax to listOf(Record(date = "2025-12-31", cost = 999.0)), // before the range
+        )
+        val totals = Stats.totals(records, LocalDate.parse("2026-01-01"), LocalDate.parse("2026-03-11"))
+        assertEquals(2_000, totals.distance)
+        assertEquals(200.0, totals.spent, 0.001)
+        assertEquals(10.0, totals.costPer100!!, 0.001)       // 200 over 2,000 km
+        assertEquals(5.8, totals.fuelCostPer100!!, 0.001)    // 116 over 2,000 km
+        assertEquals(500, totals.measuredDistance)          // one full-to-full stretch
+        assertEquals(35.0, totals.measuredFuel, 0.0)
+        assertEquals(116.0 / 75.0, totals.averageFuelPrice!!, 0.0001)
+        assertEquals(2025, Stats.firstYear(records))
+    }
 }

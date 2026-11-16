@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Oilmark</string>
+    <string name="widget_description">Odometer, consumption and the next reminder, with quick buttons to add a fuel-up</string>
 </resources>

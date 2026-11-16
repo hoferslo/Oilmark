@@ -93,6 +93,8 @@ enum class RecordType(
             Fields.cost,
             Field.Toggle("Filled to full", get = { it.isFillToFull }, set = { copy(isFillToFull = it) }),
             Field.Toggle("Missed a fuel-up before this", get = { it.missedFuelUp }, set = { copy(missedFuelUp = it) }),
+            Field.Text("Station", get = { it.extra(Extra.STATION) }, set = { withExtra(Extra.STATION, it) }),
+            Field.Text("Location", get = { it.extra(Extra.LOCATION) }, set = { withExtra(Extra.LOCATION, it) }),
             Fields.notes,
             Fields.tags,
         ),

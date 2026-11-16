@@ -11,6 +11,9 @@ okhttp = "5.5.1"
 serializationJson = "1.13.0"
 coroutines = "1.11.0"
 coil = "3.6.3"
+carApp = "1.7.0"
+work = "2.12.0"
+glance = "1.2.0"
 junit = "4.13.2"
 
 [libraries]
@@ -32,6 +35,10 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+androidx-work-runtime = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-car-app = { group = "androidx.car.app", name = "app", version.ref = "carApp" }
+androidx-car-app-projected = { group = "androidx.car.app", name = "app-projected", version.ref = "carApp" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]

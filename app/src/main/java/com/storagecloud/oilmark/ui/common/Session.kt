@@ -1,5 +1,9 @@
 package com.storagecloud.oilmark.ui.common
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -10,6 +14,8 @@ import coil3.ImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.storagecloud.oilmark.data.ApiException
 import com.storagecloud.oilmark.data.Formats
+import com.storagecloud.oilmark.notify.ReminderNotifications
+import com.storagecloud.oilmark.notify.ReminderSchedule
 import com.storagecloud.oilmark.data.FuelPriceSource
 import com.storagecloud.oilmark.data.LubeLoggerApi
 import com.storagecloud.oilmark.data.Settings
@@ -39,6 +45,20 @@ fun Session(settings: Settings, store: SettingsStore, content: @Composable () ->
             .build()
     }
     val formats = remember(settings.units, settings.currency) { Formats(settings.units, settings.currency) }
+
+    // Reminder notifications are on by default; Android 13+ needs the user's yes, asked once.
+    val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) ReminderSchedule.checkNow(context)
+    }
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            settings.reminderNotifications && !settings.notificationsAsked &&
+            !ReminderNotifications.allowed(context)
+        ) {
+            store.setNotificationsAsked()
+            askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     // Online fuel prices: fetched when the app opens (and when the switch, country or units change),
     // then written over the petrol and diesel prices in settings.

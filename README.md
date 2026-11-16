@@ -53,6 +53,15 @@ edits and deletes one record of every type, then removes the vehicle again.
   the country code is sent. The data is CC BY 4.0: keep the "Data: OpenVan.camp" credit visible
   wherever the price is shown.
 
+- Reminder notifications: `notify/ReminderNotifications.kt`, a WorkManager job every 6 hours
+  that also refreshes the home-screen widget (`widget/OilmarkWidget.kt`, Jetpack Glance).
+- The widget and notifications open screens through `Launch.kt` (extras on MainActivity's intent).
+- Fuel-up station name and location are saved as LubeLogger "extra fields" named `Station` and
+  `Location` ("lat,lon"). LubeLogger keeps them without any setup; add the same names under
+  Settings -> Extra Fields on the website to see them there too.
+- Comparisons (`ui/stats/CompareScreen.kt`) load each record type once for all vehicles via the
+  `/all` endpoints; the numbers come from `Stats.totals`.
+
 ## Not in the app yet
 
 - Editing LubeLogger "extra fields" (existing values are kept)

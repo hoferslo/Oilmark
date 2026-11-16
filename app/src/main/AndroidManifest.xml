@@ -2,6 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Where a fill-up happened; asked for the first time the user adds a location. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Reminder notifications (Android 13 and newer ask the user). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Android Auto: what the car screen may read from the car. Asked for when the user
+         switches Android Auto on in settings; unused otherwise. -->
+    <uses-permission android:name="com.google.android.gms.permission.CAR_MILEAGE" />
+    <uses-permission android:name="com.google.android.gms.permission.CAR_SPEED" />
+    <uses-permission android:name="com.google.android.gms.permission.CAR_FUEL" />
 
     <!-- usesCleartextTraffic: self-hosted LubeLogger servers are often plain http on the LAN. -->
     <application
@@ -26,6 +37,19 @@
             </intent-filter>
         </activity>
 
+        <!-- Home-screen widget. -->
+        <receiver
+            android:name=".widget.OilmarkWidgetReceiver"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/oilmark_widget" />
+        </receiver>
+
         <!-- Lets the camera app write the photo it takes into our cache folder. -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -36,6 +60,24 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Android Auto. The service is off (enabled="false") until the user switches it on in
+             settings, so Android Auto can't see or start the app before that. -->
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="1" />
+        <service
+            android:name=".car.OilmarkCarService"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.IOT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

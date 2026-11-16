@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.DirectionsCar
+import androidx.compose.material.icons.outlined.CompareArrows
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
@@ -46,6 +47,7 @@ fun GarageScreen(
     onOpenVehicle: (vehicleId: Int) -> Unit,
     onAddVehicle: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenCompare: () -> Unit,
 ) {
     val api = LocalApi.current
     val garage = rememberLoader { api.vehicles() }
@@ -55,6 +57,9 @@ fun GarageScreen(
             TopAppBar(
                 title = { Text("Garage") },
                 actions = {
+                    IconButton(onClick = onOpenCompare) {
+                        Icon(Icons.Outlined.CompareArrows, contentDescription = "Compare vehicles")
+                    }
                     IconButton(onClick = onOpenSettings) {
                         Icon(Icons.Outlined.Settings, contentDescription = "Settings")
                     }

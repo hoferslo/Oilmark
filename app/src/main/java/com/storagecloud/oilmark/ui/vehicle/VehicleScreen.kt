@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.CompareArrows
 import androidx.compose.material.icons.outlined.Insights
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Payments
@@ -83,6 +84,7 @@ fun VehicleScreen(
     onOpenRecords: (RecordType, electric: Boolean) -> Unit,
     onAddRecord: (RecordType, electric: Boolean) -> Unit,
     onOpenStats: (StatsKind) -> Unit,
+    onOpenCompare: () -> Unit,
 ) {
     val api = LocalApi.current
     val settings = LocalSettings.current
@@ -148,6 +150,7 @@ fun VehicleScreen(
                 onOpenRecords = { onOpenRecords(it, electric) },
                 onAddRecord = { onAddRecord(it, electric) },
                 onOpenStats = onOpenStats,
+                onOpenCompare = onOpenCompare,
             )
         }
     }
@@ -185,6 +188,7 @@ private fun VehicleOverview(
     onOpenRecords: (RecordType) -> Unit,
     onAddRecord: (RecordType) -> Unit,
     onOpenStats: (StatsKind) -> Unit,
+    onOpenCompare: () -> Unit,
 ) {
     val formats = LocalFormats.current
     val vehicle = info.vehicle
@@ -271,6 +275,16 @@ private fun VehicleOverview(
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 )
             }
+        }
+
+        Card(onClick = onOpenCompare, modifier = Modifier.fillMaxWidth()) {
+            ListItem(
+                leadingContent = { Icon(Icons.Outlined.CompareArrows, contentDescription = null) },
+                headlineContent = { Text("Compare years & vehicles") },
+                supportingContent = { Text("Cost per distance, consumption, year against year") },
+                trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
         }
 
         if (info.dueReminderCount > 0 && RecordType.Reminder in shown) {
